@@ -1,0 +1,75 @@
+using System;
+using System.Collections.Generic;
+using Newtonsoft.Json;
+
+using UnityEngine;
+
+public class Storage
+{
+    public int Score { get; set; } = 0;
+    public int BitişNoktası { get; set; } = 0;
+
+    public string Mail { get; set; }
+    public string Password { get; set; }
+
+
+}
+
+public class UserData
+{
+    private static UserData _instance;
+
+    public Dictionary<string, Storage> begumbal = new Dictionary<string, Storage>();
+
+    public static Storage CurrentUser { get; set; }
+
+    internal string Name;
+    internal Action<string> NameChanged;
+
+    public static UserData Instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                string data = PlayerPrefs.GetString("Data", "");
+                _instance = data.Trim() is "" or "null"
+                    ? new()
+                    : JsonConvert.DeserializeObject<UserData>(data);
+
+                Application.quitting += SaveAllDataToPrefs;
+            }
+            return _instance;
+        }
+        private set => _instance = value;
+    }
+
+
+    private static void SaveAllDataToPrefs()
+    {
+        string data = JsonConvert.SerializeObject(Instance);
+        PlayerPrefs.SetString("Data", data);
+    }
+
+    public void SetScoreForUser(string userId, int score)
+    {
+        if (!begumbal.ContainsKey(userId))
+        {
+            begumbal.Add(userId, new());
+        }
+
+        begumbal[userId].Score += score;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
